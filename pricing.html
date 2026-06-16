@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — Sowaye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Price animation */
+  .pricing-price span { transition: all 0.3s ease-in-out; }
+  .region-tag {
+    display: inline-block;
+    padding: 2px 12px;
+    background: rgba(212,160,23,0.15);
+    color: #D4A017;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="#D4A017" opacity="0.9"/>
+      <path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="none" stroke="#1B2340" stroke-width="8"/>
+      <path d="M30 40 Q50 50 70 40" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M30 60 Q50 50 70 60" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo-text">So<span>waye</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="features.html">Features</a></li>
+    <li><a href="why-it-works.html">Why Sowaye</a></li>
+    <li><a href="pricing.html" class="active">Pricing</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<section class="hero" style="min-height: 50vh; padding-top: 180px;">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="section-label">Investment</span>
+    <h1 class="hero-headline">Simple & Transparent<br><span class="gold">Plans</span></h1>
+    <p class="hero-sub">No hidden fees, no complex tiers. Choose the plan that fits your team's size and needs.</p>
+    <div id="location-badge" class="region-tag">Checking Region...</div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing" style="background: transparent;">
+  <div class="pricing-header fade-in">
+    <span class="section-label">Plan Options</span>
+    <h2 class="section-title">Scalable Solutions</h2>
+  </div>
+
+  <div class="pricing-cards fade-in">
+    <div class="pricing-card">
+      <p class="pricing-tier">Starter</p>
+      <p class="pricing-price"><sup>$</sup><span id="starter-price">20</span></p>
+      <p class="pricing-period">per month · up to 25 users</p>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>User & Employee Management</li>
+        <li>Project & Task Tracking</li>
+        <li>Time Logging & Timesheets</li>
+        <li>Leave Management</li>
+        <li>Email notifications</li>
+      </ul>
+      <a href="checkout.html?plan=starter" id="starter-btn" class="pricing-btn pricing-btn-outline">Get started</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <p class="pricing-tier">Professional</p>
+      <p class="pricing-price"><sup>$</sup><span id="pro-price">35</span></p>
+      <p class="pricing-period">per month · up to 100 users</p>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>Everything in Starter</li>
+        <li>Support Ticket System</li>
+        <li>Department Management</li>
+        <li>Holiday Calendar</li>
+        <li>Advanced Analytics & Reports</li>
+        <li>Azure AD / SSO Integration</li>
+      </ul>
+      <a href="checkout.html?plan=professional" id="pro-btn" class="pricing-btn pricing-btn-solid">Start free trial</a>
+    </div>
+
+    <div class="pricing-card">
+      <p class="pricing-tier">Enterprise</p>
+      <p class="pricing-price">Custom</p>
+      <p class="pricing-period">for unlimited users</p>
+      <div class="pricing-divider"></div>
+      <ul class="pricing-features">
+        <li>Everything in Professional</li>
+        <li>Multi-company support</li>
+        <li>Azure Blob file storage</li>
+        <li>Dedicated onboarding</li>
+        <li>Custom integrations</li>
+        <li>SLA & priority support</li>
+      </ul>
+      <a href="checkout.html?plan=enterprise" class="pricing-btn pricing-btn-outline">Contact sales</a>
+    </div>
+  </div>
+</section>
+
+<section class="comparison-section">
+  <div class="comparison-container fade-in">
+    <div class="comparison-header-main">
+      <button class="toggle-table-btn" id="toggleBtn" onclick="toggleComparisonTable()">
+  Hide Comparison Table <span id="arrow">▾</span>
+</button>
+    </div>
+
+    <div id="comparisonContent" class="comparison-wrapper open">
+      <div class="comparison-card">
+        <div class="comparison-grid-header">
+          <div class="header-col-info">
+            <h3>Compare Plans</h3>
+            <p>Find the perfect fit for your team</p>
+          </div>
+          <div class="header-col">
+            <span class="tier-label">STARTER</span>
+            <span class="tier-price" id="comp-starter-price">$20</span>
+            <span class="tier-users">Up to 25 users</span>
+            <a href="checkout.html?plan=starter" id="comp-starter-link" class="btn-table-outline">Try Free</a>
+          </div>
+          <div class="header-col active-col">
+            <span class="most-popular">MOST POPULAR</span>
+            <span class="tier-label">PROFESSIONAL</span>
+            <span class="tier-price" id="comp-pro-price">$35</span>
+            <span class="tier-users">Up to 100 users</span>
+            <a href="checkout.html?plan=professional" id="comp-pro-link" class="btn-table-solid">Try Free</a>
+          </div>
+          <div class="header-col">
+            <span class="tier-label">ENTERPRISE</span>
+            <span class="tier-price">Custom</span>
+            <span class="tier-users">Unlimited users</span>
+            <a href="checkout.html?plan=enterprise" class="btn-table-outline">Contact Sales</a>
+          </div>
+        </div>
+
+        <div class="comparison-body">
+          <div class="comparison-row"><span>PROJECT MANAGEMENT</span></div>
+          <div class="comparison-row"><span>TASK MANAGEMENT</span></div>
+          <div class="comparison-row"><span>TIME TRACKING & TIMESHEETS</span></div>
+          <div class="comparison-row"><span>LEAVE MANAGEMENT</span></div>
+          <div class="comparison-row"><span>SUPPORT TICKET SYSTEM</span></div>
+          <div class="comparison-row"><span>INTEGRATIONS & SECURITY</span></div>
+          <div class="comparison-row"><span>ANALYTICS & REPORTING</span></div>
+          <div class="comparison-row"><span>SUPPORT & SLA</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why-sowaye" style="background: rgba(13,16,32,0.6);">
+  <div class="why-header fade-in">
+    <h2 class="section-title">FAQ</h2>
+  </div>
+  <div class="why-grid fade-in" style="grid-template-columns: repeat(2, 1fr);">
+    <div class="why-card">
+      <h3 class="why-title">Can I change plans later?</h3>
+      <p class="why-desc">Yes, you can upgrade or downgrade your plan at any time from your dashboard settings.</p>
+    </div>
+    <div class="why-card">
+      <h3 class="why-title">Is there a free trial?</h3>
+      <p class="why-desc">Absolutely. You can try any plan for 14 days without a credit card to explore the full feature set.</p>
+    </div>
+    <div class="why-card">
+      <h3 class="why-title">Do you offer discounts for non-profits?</h3>
+      <p class="why-desc">Yes, we support organizations doing good in the world. Contact our sales team for special pricing.</p>
+    </div>
+    <div class="why-card">
+      <h3 class="why-title">How secure is my data?</h3>
+      <p class="why-desc">We use enterprise-grade encryption and Azure AD for secure access. Your data is backed up daily.</p>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="testimonials-header fade-in">
+    <h2 class="section-title">Trusted by Teams</h2>
+  </div>
+  <div class="testimonials-grid fade-in">
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"Sowaye saved us hours every week on leave approvals alone. The onboarding flow is incredible."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">SA</div>
+        <div><p class="author-name">Sara Ahmad</p><p class="author-role">HR Director, TechFlow Inc.</p></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"The time tracking gave us visibility we never had before. A game changer for our agency."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">RK</div>
+        <div><p class="author-name">Rayan Khan</p><p class="author-role">CEO, Pixel Studio</p></div>
+      </div>
+    </div>
+    <div class="testimonial-card">
+      <div class="testimonial-stars">★★★★★</div>
+      <p class="testimonial-text">"We rolled out Sowaye in a single afternoon. Highly recommended for modern teams."</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">MT</div>
+        <div><p class="author-name">Maria Torres</p><p class="author-role">IT Manager, FinServ Group</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="cta-content fade-in">
+    <h2 class="cta-headline">Ready to boost productivity?</h2>
+    <p class="cta-sub">Start your free trial today. No credit card required.</p>
+    <div class="hero-actions">
+      <a href="checkout.html?plan=professional" id="final-cta-link" class="btn-primary">Get Started Now</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <svg width="36" height="36" viewBox="0 0 100 100" fill="none"><path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="#D4A017" opacity="0.9"/><path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="none" stroke="#1B2340" stroke-width="8"/><path d="M30 40 Q50 50 70 40" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M30 60 Q50 50 70 60" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/></svg>
+        <span style="font-family: Syne, sans-serif; font-size: 20px; font-weight: 700; color: white;">So<span style="color: #D4A017;">waye</span></span>
+      </a>
+      <p>Enterprise-grade HRM and project management, built for modern teams. Simplify your workforce, today.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="why-it-works.html">How it works</a></li>
+        <li><a href="#">Changelog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="http://127.0.0.1:5500/terms%20of%20services.html#">Terms of Service</a></li>
+        <li><a href="#">Security</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Sowaye. All rights reserved.</p>
+    <p>Simplify Your Workforce — <a href="mailto:hello@sowaye.com" style="color: rgba(212,160,23,0.6); text-decoration:none;">hello@sowaye.com</a></p>
+  </div>
+</footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const api_url = 'http://ip-api.com/json/?fields=status,message,country,countryCode,currency';
+
+    async function getPricing() {
+        try {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 5000); 
+
+            const response = await fetch(api_url, { signal: controller.signal });
+            const data = await response.json();
+            clearTimeout(id);
+
+            if (data.status === 'success') {
+                if (data.countryCode === 'PK') {
+                    applyPrices(2800, 5600, "Rs.", "Pakistan Region", data.country);
+                } else {
+                    applyPrices(20, 35, "$", "Global Region", data.country);
+                }
+            } else {
+                throw new Error('API failed');
+            }
+        } catch (error) {
+            applyPrices(20, 35, "$", "Global", "Default");
+        }
+    }
+
+    function applyPrices(starter, pro, symbol, region, country) {
+        // UI Prices Update
+        const s_el = document.getElementById('starter-price');
+        const p_el = document.getElementById('pro-price');
+        if(s_el) s_el.innerText = starter;
+        if(p_el) p_el.innerText = pro;
+        
+        // Symbols Update
+        const starterSymbolEl = document.getElementById('starter-currency-symbol');
+        const proSymbolEl = document.getElementById('pro-currency-symbol');
+        if(starterSymbolEl) starterSymbolEl.innerText = symbol;
+        if(proSymbolEl) proSymbolEl.innerText = symbol;
+
+        const compStarter = document.getElementById('comp-starter-price');
+        const compPro = document.getElementById('comp-pro-price');
+        if(compStarter) compStarter.innerText = symbol + starter;
+        if(compPro) compPro.innerText = symbol + pro;
+        
+        // 🔴 MAIN LOGIC: Update ALL checkout links on the page
+        const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
+        allCheckoutLinks.forEach(link => {
+            const url = new URL(link.href, window.location.origin);
+            const plan = url.searchParams.get('plan') || 'starter';
+            // Ye line URL mein Rs aur 2800/5600 add karti hai
+            link.href = `checkout.html?plan=${plan}&s_p=${starter}&p_p=${pro}&cur=${encodeURIComponent(symbol)}`;
+        });
+
+        const badge = document.getElementById('location-badge');
+        if(badge) {
+            badge.innerText = `${region} Active (${country})`;
+            badge.style.background = "rgba(40, 167, 69, 0.15)"; 
+            badge.style.color = "#28a745";
+        }
+    }
+
+    getPricing();
+});
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>

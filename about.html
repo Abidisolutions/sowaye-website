@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Sowaye</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #D4A017;
+    --gold-light: #F0C040;
+    --gold-dark: #A07810;
+    --navy: #1B2340;
+    --navy-light: #2A3560;
+    --navy-mid: #3A4880;
+    --white: #FFFFFF;
+    --off-white: #FAF9F6;
+    --gray-light: #F2F0EB;
+    --gray-mid: #C8C5BC;
+    --gray-text: #7A7870;
+    --bg-dark: #0D1020;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-dark);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(13, 16, 32, 0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(212, 160, 23, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+
+  .nav-logo-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .nav-logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.5px;
+  }
+
+  .nav-logo-text span { color: var(--gold); }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--gold-light); }
+
+  .nav-cta {
+    background: var(--gold);
+    color: var(--navy) !important;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--gold-light) !important;
+    transform: translateY(-1px);
+    color: var(--navy) !important;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 160px 60px 100px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(212,160,23,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,160,23,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+    z-index: 0;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,23,0.12) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+  }
+
+  .hero-headline {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 28px;
+    animation: fadeDown 0.9s ease both;
+  }
+
+  .hero-headline .gold { color: var(--gold); }
+
+  .hero-sub {
+    font-size: 20px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto 48px;
+    animation: fadeDown 1s ease 0.2s both;
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 120px 60px; position: relative; z-index: 1; }
+
+  .section-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+
+  .section-desc {
+    font-size: 18px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.8;
+    max-width: 800px;
+  }
+
+  /* ── OUR STORY ── */
+  .our-story { background: var(--bg-dark); }
+  
+  .story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: flex-start;
+  }
+
+  .capabilities-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .capability-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .capability-item:hover {
+    background: rgba(212,160,23,0.05);
+    border-color: rgba(212,160,23,0.2);
+    transform: translateX(8px);
+  }
+
+  .capability-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 18px;
+  }
+
+  /* ── VALUES ── */
+  .values { background: rgba(27,35,64,0.15); }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .value-card {
+    background: rgba(27,35,64,0.4);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 40px 32px;
+    transition: all 0.3s;
+  }
+
+  .value-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--gold);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  }
+
+  .value-icon {
+    font-size: 32px;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .value-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .value-desc {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+  }
+
+  /* ── TECH TRANSPARENCY ── */
+  .tech { background: var(--bg-dark); }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  .tech-category h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 20px;
+    padding-left: 12px;
+    border-left: 2px solid var(--gold);
+  }
+
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .tech-pill {
+    padding: 8px 16px;
+    background: rgba(212,160,23,0.08);
+    border: 1px solid rgba(212,160,23,0.15);
+    border-radius: 100px;
+    font-size: 13px;
+    color: var(--gold-light);
+    transition: all 0.2s;
+  }
+
+  .tech-pill:hover {
+    background: var(--gold);
+    color: var(--navy);
+    transform: scale(1.05);
+  }
+
+  /* ── TEAM ── */
+  .team { background: rgba(27,35,64,0.1); }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 60px;
+  }
+
+  .team-card {
+    text-align: center;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 24px;
+    padding: 48px 32px;
+    transition: all 0.3s;
+  }
+
+  .team-card:hover {
+    background: rgba(27,35,64,0.4);
+    border-color: rgba(212,160,23,0.2);
+  }
+
+  .team-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--navy-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--white);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  .team-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .team-role {
+    font-size: 14px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 120px 60px;
+    text-align: center;
+    background: radial-gradient(circle at center, rgba(212,160,23,0.1) 0%, transparent 70%);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 16px 36px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(212,160,23,0.35);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: rgba(255,255,255,0.8);
+    padding: 16px 36px;
+    border-radius: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(212,160,23,0.4);
+    color: var(--gold-light);
+    transform: translateY(-2px);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: rgba(8, 10, 20, 0.9);
+    border-top: 1px solid rgba(212,160,23,0.1);
+    padding: 60px;
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+
+  .footer-brand p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.7;
+    margin-top: 16px;
+    max-width: 260px;
+  }
+
+  .footer-col h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 20px;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .footer-col ul li a {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-col ul li a:hover { color: var(--gold-light); }
+
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-bottom p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .story-grid { grid-template-columns: 1fr; gap: 40px; }
+    .values-grid { grid-template-columns: repeat(2, 1fr); }
+    .tech-grid { grid-template-columns: 1fr; gap: 32px; }
+    .team-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    .hero { padding: 120px 24px 60px; }
+    .values-grid, .team-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="#D4A017" opacity="0.9"/>
+      <path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="none" stroke="#1B2340" stroke-width="8"/>
+      <path d="M30 40 Q50 50 70 40" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <path d="M30 60 Q50 50 70 60" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-logo-text">So<span>waye</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="features.html">Features</a></li>
+    <li><a href="why-it-works.html">Why Sowaye</a></li>
+    <li><a href="pricing.html">Pricing</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <span class="section-label" style="animation: fadeDown 0.8s ease both;">Our Purpose</span>
+    <h1 class="hero-headline">We built the platform we<br><span class="gold">always wished existed</span></h1>
+    <p class="hero-sub">Sowaye was born out of frustration with fragmented HR tools, missed project deadlines, and endless spreadsheets. We set out to build one unified platform that gives every role exactly what they need.</p>
+  </div>
+</section>
+
+<!-- OUR STORY -->
+<section class="our-story">
+  <div class="story-grid">
+    <div class="fade-in">
+      <span class="section-label">Our Story</span>
+      <h2 class="section-title">From Internal Tool to<br>Global Solution</h2>
+      <p class="section-desc">Sowaye started as ABIDI Pro, an internal HRM and project management system built by Abidi Solutions to manage their own workforce. After solving our own operational challenges, we rebuilt it as a professional product for the world.</p>
+      
+      <div class="capabilities-list">
+        <div class="capability-item">
+          <span class="capability-icon">✓</span>
+          <span>Internal system pedigree</span>
+        </div>
+        <div class="capability-item">
+          <span class="capability-icon">✓</span>
+          <span>Rebuilt for scale & security</span>
+        </div>
+        <div class="capability-item">
+          <span class="capability-icon">✓</span>
+          <span>Direct user feedback loop</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fade-in" style="background: rgba(212,160,23,0.03); padding: 40px; border-radius: 24px; border: 1px solid rgba(212,160,23,0.1);">
+      <h3 style="font-family: Syne, sans-serif; margin-bottom: 24px;">Today Sowaye handles:</h3>
+      <ul style="list-style: none; display: flex; flex-direction: column; gap: 14px;">
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Employee onboarding & RBAC
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Project timelines & budgets
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Task dependencies & tracking
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Time logging & timesheets
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Leave & calendar management
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Full history support ticketing
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Multi-company management
+        </li>
+        <li style="display: flex; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7);">
+          <span style="color: var(--gold);">→</span> Deep Azure ecosystem integration
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- MISSION -->
+<section class="mission" style="text-align: center; background: rgba(212,160,23,0.02);">
+  <div class="fade-in">
+    <span class="section-label">Our Mission</span>
+    <h2 class="section-title" style="max-width: 900px; margin: 0 auto 32px;">"Our mission is to remove the operational friction that slows great teams down — so people can focus on the work that actually matters."</h2>
+    <div style="width: 60px; height: 3px; background: var(--gold); margin: 0 auto;"></div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values">
+  <div class="fade-in">
+    <span class="section-label">Our Core Values</span>
+    <h2 class="section-title">The Principles Behind Sowaye</h2>
+  </div>
+  
+  <div class="values-grid">
+    <div class="value-card fade-in">
+      <span class="value-icon">⚡</span>
+      <h3 class="value-title">Simplicity First</h3>
+      <p class="value-desc">We strip away complexity so your team can move faster. Every click counts, every view is optimized.</p>
+    </div>
+    <div class="value-card fade-in">
+      <span class="value-icon">👥</span>
+      <h3 class="value-title">Built for Every Role</h3>
+      <p class="value-desc">From admins to employees, every user gets what they need without the noise. Tailored workflows for all.</p>
+    </div>
+    <div class="value-card fade-in">
+      <span class="value-icon">🛡️</span>
+      <h3 class="value-title">Enterprise Security</h3>
+      <p class="value-desc">JWT auth, bcrypt, role-based access, and seamless Azure AD SSO mean your data stays yours.</p>
+    </div>
+    <div class="value-card fade-in">
+      <span class="value-icon">🚀</span>
+      <h3 class="value-title">Always Improving</h3>
+      <p class="value-desc">Continuous releases, real user feedback, and zero feature bloat. We evolve at the speed of business.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- TEAM -->
+<section class="team">
+  <div class="fade-in">
+    <span class="section-label">Our Team</span>
+    <h2 class="section-title">The People Behind the Platform</h2>
+  </div>
+  
+  <div class="team-grid">
+    <div class="team-card fade-in">
+      <div class="team-avatar">AS</div>
+      <h3 class="team-name">Abidi Solutions</h3>
+      <p class="team-role">Development Team</p>
+    </div>
+    <div class="team-card fade-in">
+      <div class="team-avatar">TL</div>
+      <h3 class="team-name">Team Lead</h3>
+      <p class="team-role">Project Management</p>
+    </div>
+    <div class="team-card fade-in">
+      <div class="team-avatar">QA</div>
+      <h3 class="team-name">QA Department</h3>
+      <p class="team-role">Quality Assurance</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="fade-in">
+    <h2 class="section-title" style="margin-bottom: 12px;">Want to see Sowaye in action?</h2>
+    <p class="section-desc" style="margin: 0 auto 40px;">Book a demo or start your free trial. No credit card required.</p>
+    <div style="display: flex; gap: 16px; justify-content: center;">
+      <a href="index.html#contact" class="btn-primary">Start Free Trial</a>
+      <a href="mailto:support@abidisolutions.com" class="btn-secondary">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo" style="text-decoration:none;">
+        <svg width="36" height="36" viewBox="0 0 100 100" fill="none"><path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="#D4A017" opacity="0.9"/><path d="M20 35 L50 15 L80 35 L80 65 L50 85 L20 65 Z" fill="none" stroke="#1B2340" stroke-width="8"/><path d="M30 40 Q50 50 70 40" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M30 60 Q50 50 70 60" stroke="#1B2340" stroke-width="8" fill="none" stroke-linecap="round"/></svg>
+        <span style="font-family: Syne, sans-serif; font-size: 20px; font-weight: 700; color: white;">So<span style="color: #D4A017;">waye</span></span>
+      </a>
+      <p>Enterprise-grade HRM and project management, built for modern teams. Simplify your workforce, today.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="features.html">Features</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="why-it-works.html">How it works</a></li>
+        <li><a href="#">Changelog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="http://127.0.0.1:5500/terms%20of%20services.html#">Terms of Service</a></li>
+        <li><a href="#">Security</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Sowaye. All rights reserved.</p>
+    <p>Simplify Your Workforce — <a href="mailto:hello@sowaye.com" style="color: rgba(212,160,23,0.6); text-decoration:none;">hello@sowaye.com</a></p>
+  </div>
+</footer>
+
+<script>
+  // Scroll-triggered fade-in
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 60) {
+      nav.style.background = 'rgba(8,10,20,0.95)';
+      nav.style.boxShadow = '0 2px 30px rgba(0,0,0,0.4)';
+    } else {
+      nav.style.background = 'rgba(13,16,32,0.7)';
+      nav.style.boxShadow = 'none';
+    }
+  });
+
+  // Staggered animation for cards
+  const valueCards = document.querySelectorAll('.value-card, .team-card, .tech-category');
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, (Array.from(valueCards).indexOf(entry.target) % 4) * 100);
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  valueCards.forEach(card => cardObserver.observe(card));
+</script>
+</body>
+</html>
