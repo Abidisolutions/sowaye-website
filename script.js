@@ -207,4 +207,16 @@ function toggleComparisonTable() {
         : 'Show Comparison Table <span id="arrow">▸</span>';
 }
 
-document.addEventListener('DOMContentLoaded', initPricing);
+function setupComparisonRows() {
+    const comparisonRows = document.querySelectorAll('.comparison-row');
+    comparisonRows.forEach(row => {
+        row.addEventListener('click', () => {
+            row.classList.toggle('open');
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initPricing();
+    setupComparisonRows();
+});
