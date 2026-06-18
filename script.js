@@ -196,4 +196,15 @@ async function initPricing() {
     }
 }
 
+function toggleComparisonTable() {
+    const comparisonContent = document.getElementById('comparisonContent');
+    const toggleBtn = document.getElementById('toggleBtn');
+    if (!comparisonContent || !toggleBtn) return;
+
+    const isOpen = comparisonContent.classList.toggle('open');
+    toggleBtn.innerHTML = isOpen
+        ? 'Hide Comparison Table <span id="arrow">▾</span>'
+        : 'Show Comparison Table <span id="arrow">▸</span>';
+}
+
 document.addEventListener('DOMContentLoaded', initPricing);
