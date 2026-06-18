@@ -1412,13 +1412,16 @@ footer {
 .most-popular {
   position: absolute;
   top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
   background: #d4a017;
   color: #000;
   font-size: 9px;
   font-weight: 800;
-  padding: 3px 10px;
+  padding: 6px 14px;
   border-radius: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 /* Typography & Pricing */
