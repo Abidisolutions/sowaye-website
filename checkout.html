@@ -1083,150 +1083,162 @@
     <p><a href="mailto:hello@sowaye.com" style="color: rgba(212,160,23,0.6); text-decoration:none;">hello@sowaye.com</a></p>
   </div>
 </footer>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const params = new URLSearchParams(window.location.search);
-    const planParam = params.get('plan') || 'starter';
-
-    // URL se Prices aur Symbol uthana (Agar URL mein na ho to default $20/$35)
-    const cur = params.get('cur') ? decodeURIComponent(params.get('cur')) : '$';
-    const s_p = params.get('s_p') || '20';
-    const p_p = params.get('p_p') || '35';
-
-    const planPrices = {
-        'starter': s_p,
-        'professional': p_p
-    };
-
-    // 1. Left Side: Cards ke andar prices update karna
-    document.querySelectorAll('.plan-option').forEach(opt => {
-        const type = opt.getAttribute('data-plan');
-        const priceTag = opt.querySelector('.plan-opt-price');
-        
-        if (priceTag && planPrices[type]) {
-            // Yahan symbol aur price lag raha hai
-            priceTag.innerHTML = `${cur}<span class="price-display">${planPrices[type]}</span><span class="plan-opt-period">/mo</span>`;
-        } else if (priceTag && type === 'enterprise') {
-            priceTag.innerHTML = `Custom`;
-        }
-    });
-
-    // 2. Right Side: Order Summary update karna
-    function updateRightSummary() {
-        // Check karna ke is waqt konsa plan selected (active) hai
-        const activeOpt = document.querySelector('.plan-option.active');
-        let currentPlan = planParam;
-        if (activeOpt) {
-            currentPlan = activeOpt.getAttribute('data-plan');
-        }
-
-        const baseElem = document.getElementById('summary-base-price');
-        const totalElem = document.getElementById('summary-total');
-        const nameElem = document.getElementById('summary-plan-name');
-
-        if(nameElem) {
-            nameElem.textContent = currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1) + ' Plan';
-        }
-
-        if (currentPlan === 'enterprise') {
-            if(baseElem) baseElem.textContent = 'Custom';
-            if(totalElem) totalElem.textContent = 'Custom';
-        } else if (planPrices[currentPlan]) {
-            // Yahan summary mein symbol aur price lag raha hai
-            if(baseElem) baseElem.textContent = `${cur}${planPrices[currentPlan]}`;
-            if(totalElem) totalElem.textContent = `${cur}${planPrices[currentPlan]}`;
-        }
-    }
-
-    // Page load par update karein
-    setTimeout(updateRightSummary, 100);
-
-    // Agar user checkout page par koi aur plan select kare, to summary automatically change ho
-    document.querySelectorAll('.plan-option').forEach(opt => {
-        opt.addEventListener('click', () => {
-            setTimeout(updateRightSummary, 50);
-        });
-    });
-});
-</script>
+<script src="script.js"></script>
 <script>
 (function() {
-  // 1. URL se Parameters nikalna
   const params = new URLSearchParams(window.location.search);
-  const planParam = params.get('plan') || 'starter';
-  
-  // Pricing page se bheji gayi values (s_p = starter price, p_p = pro price, cur = symbol)
-  const dynamicStarter = params.get('s_p');
-  const dynamicPro = params.get('p_p');
-  
-  // Currency symbol ko decode karna (e.g., %24 ban jayega $)
-  // Default value '$' rakhi hai agar URL mein kuch na mile
+  const urlPlan = params.get('plan') || 'starter';
+  const urlBilling = params.get('billing');
+  const urlStarterPrice = params.get('s_p') || params.get('starter');
+  const urlProPrice = params.get('p_p') || params.get('pro');
   const currencySymbol = params.get('cur') ? decodeURIComponent(params.get('cur')) : '$';
 
-  // 2. Plan Data Object
+  let state = {
+    plan: urlPlan,
+    billing: urlBilling === 'yearly' ? 'yearly' : 'monthly',
+    promoApplied: false,
+    promoDiscount: 0
+  };
+
   const planData = {
     starter: {
       name: 'Starter',
-      monthly: dynamicStarter ? parseFloat(dynamicStarter) : 20,
+      monthly: urlStarterPrice && !isNaN(urlStarterPrice) ? parseFloat(urlStarterPrice) : 20,
+      yearly: urlStarterPrice && !isNaN(urlStarterPrice) ? parseFloat(urlStarterPrice) * 0.8 : 16,
       users: 'Up to 25 users',
-      features: ['User & Employee Management','Project & Task Tracking','Time Logging & Timesheets']
+      features: ['User & Employee Management','Project & Task Tracking','Time Logging & Timesheets','Leave Management','Email notifications']
     },
     professional: {
       name: 'Professional',
-      monthly: dynamicPro ? parseFloat(dynamicPro) : 35,
+      monthly: urlProPrice && !isNaN(urlProPrice) ? parseFloat(urlProPrice) : 35,
+      yearly: urlProPrice && !isNaN(urlProPrice) ? parseFloat(urlProPrice) * 0.8 : 28,
       users: 'Up to 100 users',
-      features: ['Everything in Starter','Support Ticket System','Advanced Analytics']
+      features: ['Everything in Starter','Support Ticket System','Department Management','Holiday Calendar','Advanced Analytics & Reports','Azure AD / SSO Integration']
     },
     enterprise: {
       name: 'Enterprise',
       monthly: 0,
+      yearly: 0,
       users: 'Unlimited users',
-      features: ['Everything in Professional','Dedicated onboarding']
+      features: ['Everything in Professional','Multi-company support','Azure Blob Storage','Dedicated onboarding','Custom integrations','SLA & priority support']
     }
   };
 
-  let currentPlan = planParam;
+  if (!planData[state.plan]) state.plan = 'starter';
 
-  // 3. UI Update Function
-  function updateCheckoutUI() {
-    const data = planData[currentPlan];
-    
-    // Sabhi Plan Options (Left side cards) mein prices aur symbol update karna
-    document.querySelectorAll('.plan-option').forEach(opt => {
-        const planKey = opt.dataset.plan;
-        const planInfo = planData[planKey];
-        const priceContainer = opt.querySelector('.plan-opt-price');
+  const planOptions = document.querySelectorAll('.plan-option');
+  const billMonthly = document.getElementById('bill-monthly');
+  const billYearly = document.getElementById('bill-yearly');
 
-        if(priceContainer && planInfo.monthly > 0) {
-            // Yahan wahi symbol show hoga jo pricing page se aaya hai
-            priceContainer.innerHTML = `${currencySymbol}<span class="price-display">${planInfo.monthly}</span>`;
-        } else if (priceContainer && planKey === 'enterprise') {
-            priceContainer.innerHTML = `Custom`;
-        }
+  function markSelectedPlan() {
+    planOptions.forEach(opt => {
+      opt.classList.toggle('selected', opt.dataset.plan === state.plan);
     });
-
-    // 4. Order Summary (Right side box) update karna
-    const summaryPlanName = document.getElementById('summary-plan-name');
-    const summaryBasePrice = document.getElementById('summary-base-price');
-    const summaryTotal = document.getElementById('summary-total');
-
-    if (summaryPlanName) summaryPlanName.textContent = data.name + ' Plan';
-    
-    if (currentPlan === 'enterprise') {
-        if (summaryBasePrice) summaryBasePrice.textContent = 'Contact Us';
-        if (summaryTotal) summaryTotal.textContent = 'Custom';
-    } else {
-        // Dynamic Currency Alignment yahan ho rahi hai
-        if (summaryBasePrice) summaryBasePrice.textContent = currencySymbol + data.monthly;
-        if (summaryTotal) summaryTotal.textContent = currencySymbol + data.monthly;
-    }
   }
 
-  // Initial Run
-  updateCheckoutUI();
+  function updatePlanPrices() {
+    planOptions.forEach(opt => {
+      const monthly = parseFloat(opt.dataset.monthly);
+      const yearly = parseFloat(opt.dataset.yearly);
+      const display = opt.querySelector('.price-display');
+      if (!display) return;
+      const val = state.billing === 'yearly' ? yearly : monthly;
+      display.textContent = val > 0 ? val.toFixed(0) : 'Custom';
+    });
+  }
+
+  function updateSummary() {
+    const plan = planData[state.plan];
+    const isYearly = state.billing === 'yearly';
+    const isEnterprise = state.plan === 'enterprise';
+
+    document.getElementById('summary-plan-name').textContent = plan.name + ' Plan';
+    document.getElementById('summary-plan-tagline').textContent = plan.users + ' · Billed ' + (isYearly ? 'Annually' : 'Monthly');
+
+    const featList = document.getElementById('summary-features');
+    if (featList) featList.innerHTML = plan.features.map(f => `<li>${f}</li>`).join('');
+
+    if (isEnterprise) {
+      document.getElementById('summary-base-label').textContent = 'Enterprise (Custom Pricing)';
+      document.getElementById('summary-base-price').textContent = 'TBD';
+      document.getElementById('summary-total').textContent = 'Custom';
+      document.getElementById('summary-period').textContent = 'Contact our sales team';
+      document.getElementById('discount-line').style.display = 'none';
+      document.querySelector('#submit-btn .btn-text').innerHTML = '📩 &nbsp;Contact Sales Team';
+      document.getElementById('submit-note-text').textContent = 'Our team will reach out within 24 hours.';
+      return;
+    }
+
+    document.querySelector('#submit-btn .btn-text').innerHTML = '🔒 &nbsp;Complete Purchase';
+    document.getElementById('submit-note-text').textContent = '14-day free trial included. Cancel anytime.';
+
+    const basePrice = isYearly ? plan.yearly : plan.monthly;
+    const discount = isYearly ? (plan.monthly - plan.yearly) : 0;
+    const total = Math.max(0, basePrice - state.promoDiscount);
+
+    document.getElementById('summary-base-label').textContent = plan.name + ' Plan (' + (isYearly ? 'Yearly' : 'Monthly') + ')';
+    document.getElementById('summary-base-price').textContent = currencySymbol + basePrice.toFixed(0);
+
+    if (isYearly) {
+      document.getElementById('discount-line').style.display = 'flex';
+      document.getElementById('summary-discount').textContent = '–' + currencySymbol + (discount * 12).toFixed(0) + '/yr';
+    } else {
+      document.getElementById('discount-line').style.display = 'none';
+    }
+
+    document.getElementById('summary-total').textContent = currencySymbol + total.toFixed(0);
+    document.getElementById('summary-period').textContent = isYearly
+      ? 'per month · billed ' + currencySymbol + (basePrice * 12).toFixed(0) + ' annually'
+      : 'per month · cancel anytime';
+  }
+
+  planOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      state.plan = opt.dataset.plan;
+      markSelectedPlan();
+      updateSummary();
+    });
+  });
+
+  if (billMonthly && billYearly) {
+    if (state.billing === 'yearly') {
+      billMonthly.classList.remove('selected');
+      billYearly.classList.add('selected');
+    }
+
+    billMonthly.addEventListener('click', () => {
+      state.billing = 'monthly';
+      billMonthly.classList.add('selected');
+      billYearly.classList.remove('selected');
+      updatePlanPrices();
+      updateSummary();
+    });
+
+    billYearly.addEventListener('click', () => {
+      state.billing = 'yearly';
+      billYearly.classList.add('selected');
+      billMonthly.classList.remove('selected');
+      updatePlanPrices();
+      updateSummary();
+    });
+  }
+
+  function applyPricesToPlanOptions() {
+    planOptions.forEach(opt => {
+      const planKey = opt.dataset.plan;
+      const plan = planData[planKey];
+      const display = opt.querySelector('.price-display');
+      if (!display) return;
+      const value = state.billing === 'yearly' ? plan.yearly : plan.monthly;
+      display.textContent = value > 0 ? value.toFixed(0) : 'Custom';
+    });
+  }
+
+  updatePlanPrices();
+  markSelectedPlan();
+  updateSummary();
 })();
 </script>
-<script src="script.js"></script>
 <script>
 (function() {
 
