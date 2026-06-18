@@ -1456,6 +1456,20 @@ footer {
   letter-spacing: 1.5px;
   text-transform: uppercase;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.comparison-category .category-toggle {
+  font-size: 16px;
+  color: #d4a017;
+  transition: transform 0.2s ease;
+}
+
+.comparison-category.collapsed .category-toggle {
+  transform: rotate(-90deg);
 }
 
 .comparison-row {
@@ -1468,6 +1482,10 @@ footer {
   color: #e0e0e0;
   font-size: 14px;
   font-weight: 500;
+}
+
+.comparison-row.hidden {
+  display: none;
 }
 
 .row-label {

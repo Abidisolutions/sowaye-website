@@ -207,16 +207,21 @@ function toggleComparisonTable() {
         : 'Show Comparison Table <span id="arrow">▸</span>';
 }
 
-function setupComparisonRows() {
-    const comparisonRows = document.querySelectorAll('.comparison-row');
-    comparisonRows.forEach(row => {
-        row.addEventListener('click', () => {
-            row.classList.toggle('open');
+function setupComparisonCategories() {
+    const categories = document.querySelectorAll('.comparison-category');
+    categories.forEach(category => {
+        const categoryName = category.dataset.category;
+        const rows = Array.from(document.querySelectorAll(`.comparison-row[data-category="${categoryName}"]`));
+        if (!rows.length) return;
+
+        category.addEventListener('click', () => {
+            const collapsed = category.classList.toggle('collapsed');
+            rows.forEach(row => row.classList.toggle('hidden', collapsed));
         });
     });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     initPricing();
-    setupComparisonRows();
+    setupComparisonCategories();
 });
