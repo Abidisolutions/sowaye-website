@@ -24,13 +24,17 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--bg-dark);
     color: var(--white);
     overflow-x: hidden;
+    min-width: 320px;
   }
 
   /* ── NOISE OVERLAY ── */
@@ -112,6 +116,32 @@
     background: var(--gold-light) !important;
     transform: translateY(-1px);
     color: var(--navy) !important;
+  }
+
+  .hero-video-container {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: rgba(13,16,32,0.85);
+  }
+
+  .hero-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    min-width: 100%;
+    min-height: 100%;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13,16,32,0.2) 0%, rgba(13,16,32,0.85) 100%);
+    pointer-events: none;
   }
 
   /* ── HERO ── */
@@ -219,7 +249,13 @@
     gap: 16px;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     animation: fadeDown 1.1s ease 0.3s both;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    min-width: 180px;
   }
 
   .btn-primary {
@@ -273,6 +309,7 @@
     padding-top: 60px;
     border-top: 1px solid rgba(255,255,255,0.08);
     animation: fadeUp 1.2s ease 0.5s both;
+    flex-wrap: wrap;
   }
 
   .stat-item {
@@ -1318,12 +1355,16 @@
     nav { padding: 16px 20px; }
     .nav-links { display: none; }
     .nav-logo-text { font-size: 18px; }
-    .hero { padding: 80px 20px 50px; }
-    .hero-headline { font-size: clamp(32px, 9vw, 48px); }
-    .hero-sub { max-width: 100%; margin-bottom: 32px; }
-    .hero-actions { flex-direction: column; gap: 14px; }
+    .hero { padding: 110px 18px 50px; min-height: calc(100vh - 90px); }
+    .hero-headline { font-size: clamp(32px, 9vw, 48px); line-height: 1.05; }
+    .hero-sub { max-width: 100%; margin: 0 auto 32px; font-size: 18px; }
+    .hero-actions { flex-direction: column; gap: 14px; width: 100%; }
     .btn-primary, .btn-secondary { width: 100%; justify-content: center; padding: 14px 20px; }
-    .hero-stats { gap: 22px; }
+    .hero-stats { gap: 18px; }
+    .hero-stats { flex-wrap: wrap; }
+    .hero-stats .stat-item { flex: 1 1 50%; min-width: 140px; }
+    .hero-glow { width: 520px; height: 520px; }
+    .hero-video-container { display: none; }
     .features { padding: 70px 20px; }
     .features-header { flex-direction: column; gap: 20px; align-items: flex-start; }
     .features-grid { grid-template-columns: 1fr; }
