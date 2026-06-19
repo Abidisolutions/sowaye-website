@@ -224,10 +224,11 @@ function setupPricingCardSelection() {
     };
 
     cards.forEach(card => {
+        card.addEventListener('mousedown', () => selectCard(card));
         card.addEventListener('click', () => selectCard(card));
     });
 
-    const initial = document.querySelector('.pricing-card.selected-card[data-plan]') || cards[0];
+    const initial = cards[1] || cards[0];
     selectCard(initial);
 }
 
