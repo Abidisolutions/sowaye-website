@@ -592,6 +592,12 @@ section {
   display: block;
 }
 
+.why-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--gold);
+}
+
 .why-title {
   font-family: 'Syne', sans-serif;
   font-size: 18px;
