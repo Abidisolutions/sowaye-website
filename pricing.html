@@ -407,6 +407,20 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
+  // Convert USD amount to target currency using exchangerate.host (no API key)
+  async function convertUsdToCurrency(amountUsd, targetCurrency) {
+    if (!targetCurrency || targetCurrency.toUpperCase() === 'USD') return amountUsd;
+    const url = `https://api.exchangerate.host/convert?from=USD&to=${encodeURIComponent(targetCurrency)}&amount=${encodeURIComponent(amountUsd)}`;
+    try {
+      const res = await fetchWithTimeout(url, 5000);
+      if (!res.ok) throw new Error('rate fetch failed');
+      const data = await res.json();
+      if (data && (data.result || data.result === 0)) return Number(data.result);
+    } catch (e) {
+      console.warn('Currency convert failed', e && e.message);
+    }
+    return null;
+  }
 
   // Try multiple public geo IP services until one succeeds
   async function detectGeo() {
@@ -428,6 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
         continue;
       }
     }
+
     return null;
   }
 
@@ -448,49 +463,84 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const symbol = currencySymbols[currencyCode] || '$';
 
-      if (asianCountries.has(countryCode)) {
-        applyPrices(10, 25, symbol, 'Asian Pricing', countryName, countryCode, currencyCode);
-      } else {
-        applyPrices(20, 35, symbol, 'International Pricing', countryName, countryCode, currencyCode);
-      }
+      // Base USD amounts (before local conversion)
+      const base = asianCountries.has(countryCode) ? { starter: 10, professional: 25, regionLabel: 'Asian Pricing' } : { starter: 20, professional: 35, regionLabel: 'International Pricing' };
+
+      // Try convert to local currency; if conversion fails we'll fall back to USD display
+      const convertedStarter = await convertUsdToCurrency(base.starter, currencyCode);
+      const convertedPro = await convertUsdToCurrency(base.professional, currencyCode);
+
+      const displayStarter = (convertedStarter === null) ? null : convertedStarter;
+      const displayPro = (convertedPro === null) ? null : convertedPro;
+
+      applyPrices(base.starter, base.professional, displayStarter, displayPro, symbol, base.regionLabel, countryName, countryCode, currencyCode);
     } catch (error) {
       console.error('getPricing error', error);
       applyPrices(20, 35, '$', 'International', 'Default', 'US', 'USD');
     }
   }
 
-  function applyPrices(starter, pro, symbol, region, country, countryCode, currencyCode) {
-        const s_el = document.getElementById('starter-price');
-        const p_el = document.getElementById('pro-price');
-    if (s_el) s_el.innerText = `${symbol}${starter}`;
-    if (p_el) p_el.innerText = `${symbol}${pro}`;
+  function applyPrices(baseStarterUsd, baseProUsd, localStarter, localPro, symbol, region, country, countryCode, currencyCode) {
+    const s_el = document.getElementById('starter-price');
+    const p_el = document.getElementById('pro-price');
 
-        const compStarter = document.getElementById('comp-starter-price');
-        const compPro = document.getElementById('comp-pro-price');
-        if (compStarter) compStarter.innerText = `${symbol}${starter}`;
-        if (compPro) compPro.innerText = `${symbol}${pro}`;
-
-        const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
-        allCheckoutLinks.forEach(link => {
-          const url = new URL(link.href, window.location.origin);
-          const plan = url.searchParams.get('plan') || 'starter';
-          // Pass both numeric prices and currency code for reliable handling on checkout
-          link.href = `checkout.html?plan=${plan}&starter=${starter}&professional=${pro}&currency=${encodeURIComponent(currencyCode)}&symbol=${encodeURIComponent(symbol)}&country=${encodeURIComponent(countryCode)}`;
-        });
-
-        const badge = document.getElementById('location-badge');
-        if (badge) {
-          badge.innerText = `${country} pricing active`;
-          badge.title = `${region} — ${country} (${currencyCode})`;
-          badge.style.background = 'rgba(234,179,8,0.18)';
-          badge.style.color = '#F0C040';
-          if (window.location.protocol === 'file:') {
-            // Warn if opened directly via file:// — some browsers block cross-origin requests
-            badge.innerText = `${country} pricing active (file mode)`;
-            console.warn('File protocol detected — consider serving site via http://localhost for reliable geo lookups');
-          }
-        }
+    // Format numbers using Intl if available
+    let starterText, proText;
+    try {
+      if (localStarter !== null && localStarter !== undefined) {
+        starterText = new Intl.NumberFormat(undefined, { style: 'currency', currency: currencyCode }).format(localStarter);
+      } else {
+        starterText = `${symbol}${baseStarterUsd} USD`;
+      }
+      if (localPro !== null && localPro !== undefined) {
+        proText = new Intl.NumberFormat(undefined, { style: 'currency', currency: currencyCode }).format(localPro);
+      } else {
+        proText = `${symbol}${baseProUsd} USD`;
+      }
+    } catch (e) {
+      // Fallback simple formatting
+      starterText = (localStarter !== null && localStarter !== undefined) ? `${symbol}${localStarter.toFixed(2)}` : `${symbol}${baseStarterUsd} USD`;
+      proText = (localPro !== null && localPro !== undefined) ? `${symbol}${localPro.toFixed(2)}` : `${symbol}${baseProUsd} USD`;
     }
+
+    if (s_el) s_el.innerText = starterText;
+    if (p_el) p_el.innerText = proText;
+
+    const compStarter = document.getElementById('comp-starter-price');
+    const compPro = document.getElementById('comp-pro-price');
+    if (compStarter) compStarter.innerText = starterText;
+    if (compPro) compPro.innerText = proText;
+
+    const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
+    allCheckoutLinks.forEach(link => {
+      const url = new URL(link.href, window.location.origin);
+      const plan = url.searchParams.get('plan') || 'starter';
+      // Pass base USD and local converted amounts (if available) plus currency info
+      const params = new URLSearchParams();
+      params.set('plan', plan);
+      params.set('starter_usd', String(baseStarterUsd));
+      params.set('professional_usd', String(baseProUsd));
+      if (localStarter !== null && localStarter !== undefined) params.set('starter_local', String(Number(localStarter.toFixed(2))));
+      if (localPro !== null && localPro !== undefined) params.set('professional_local', String(Number(localPro.toFixed(2))));
+      params.set('currency', String(currencyCode));
+      params.set('symbol', String(symbol));
+      params.set('country', String(countryCode));
+      link.href = `checkout.html?${params.toString()}`;
+    });
+
+    const badge = document.getElementById('location-badge');
+    if (badge) {
+      badge.innerText = `${country} pricing active`;
+      badge.title = `${region} — ${country} (${currencyCode})`;
+      badge.style.background = 'rgba(234,179,8,0.18)';
+      badge.style.color = '#F0C040';
+      if (window.location.protocol === 'file:') {
+        // Warn if opened directly via file:// — some browsers block cross-origin requests
+        badge.innerText = `${country} pricing active (file mode)`;
+        console.warn('File protocol detected — consider serving site via http://localhost for reliable geo lookups');
+      }
+    }
+  }
 
       // Start detection
       getPricing();
