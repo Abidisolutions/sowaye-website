@@ -1581,6 +1581,17 @@ footer {
   filter: brightness(0.6) contrast(1.1);
 }
 
+.hero-video-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.4;
+  filter: brightness(0.6) contrast(1.1);
+}
+
 .hero-overlay {
   position: absolute;
   inset: 0;

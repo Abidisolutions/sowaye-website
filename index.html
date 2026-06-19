@@ -30,18 +30,18 @@
   </ul>
 </nav>
 <!-- ── HERO VIDEO BACKGROUND ── -->
-<div class="hero-video-container">
+<div class="hero-video-container" id="hero-video-container">
   <video 
     autoplay 
     muted 
     loop 
     playsinline 
-    poster="images/hero-fallback.jpg" 
-    class="hero-video">
-    <source src="video/videoplayback.mp4" type="video/mp4">
-    <!-- Agar video support na ho to image backup -->
-    <img src="image/22193.jpg" title="Sowaye HR Software">
+    poster="Image/22193.jpg" 
+    class="hero-video"
+    id="hero-video">
+    <source src="Video/videoplayback.mp4" type="video/mp4">
   </video>
+  <img id="video-fallback" src="Image/22193.jpg" class="hero-video-fallback" style="display:none;" title="Sowaye HR Software">
   <div class="hero-overlay"></div>
 </div>
 
@@ -359,5 +359,49 @@
 </footer>
 
 <script src="script.js"></script>
+
+<!-- Hero Video Fallback Handler -->
+<script>
+(function() {
+  const videoEl = document.getElementById('hero-video');
+  const fallbackImg = document.getElementById('video-fallback');
+  const videoContainer = document.getElementById('hero-video-container');
+  
+  if (!videoEl || !fallbackImg) return;
+
+  // Show fallback if video fails to load or play
+  const showFallback = () => {
+    videoEl.style.display = 'none';
+    fallbackImg.style.display = 'block';
+  };
+
+  // Handle various video error events
+  videoEl.addEventListener('error', showFallback);
+  videoEl.addEventListener('loadstart', () => {
+    // Reset fallback on new load attempt
+    fallbackImg.style.display = 'none';
+    videoEl.style.display = 'block';
+  });
+
+  // Fallback for when video refuses to load (network timeout/issues)
+  const videoTimeout = setTimeout(() => {
+    if (videoEl.networkState === 0 || videoEl.readyState === 0) {
+      // Video hasn't started loading
+      showFallback();
+    }
+  }, 3000); // 3 second timeout
+
+  // Clear timeout if video loads successfully
+  videoEl.addEventListener('canplay', () => {
+    clearTimeout(videoTimeout);
+  });
+
+  // Also handle play errors
+  videoEl.addEventListener('play', () => {
+    clearTimeout(videoTimeout);
+  });
+})();
+</script>
+
 </body>
 </html>
