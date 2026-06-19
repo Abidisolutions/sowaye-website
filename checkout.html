@@ -1089,9 +1089,10 @@
   const params = new URLSearchParams(window.location.search);
   const urlPlan = params.get('plan') || 'starter';
   const urlBilling = params.get('billing');
-  const urlStarterPrice = params.get('s_p') || params.get('starter');
-  const urlProPrice = params.get('p_p') || params.get('pro');
-  const currencySymbol = params.get('cur') ? decodeURIComponent(params.get('cur')) : '$';
+  const urlStarterPrice = params.get('starter_local') || params.get('starter_usd') || params.get('s_p') || params.get('starter');
+  const urlProPrice = params.get('professional_local') || params.get('professional_usd') || params.get('p_p') || params.get('pro');
+  const currencySymbol = params.get('symbol') ? decodeURIComponent(params.get('symbol')) : (params.get('cur') ? decodeURIComponent(params.get('cur')) : '$');
+  const currencyCodeParam = params.get('currency') || params.get('cur_code') || params.get('currency_code') || null;
 
   let state = {
     plan: urlPlan,
@@ -1248,8 +1249,11 @@
   const urlBilling = params.get('billing');
   
   // Naye parameters jo pricing page se aa rahay hain
-  const urlStarterPrice = params.get('starter');
-  const urlProPrice = params.get('pro');
+  // Prefer local converted prices, then local USD fallbacks, then old params
+  const urlStarterPrice = params.get('starter_local') || params.get('starter_usd') || params.get('starter');
+  const urlProPrice = params.get('professional_local') || params.get('professional_usd') || params.get('pro');
+  const currencySymbol = params.get('symbol') ? decodeURIComponent(params.get('symbol')) : '$';
+  const currencyCodeParam = params.get('currency') || null;
 
   // ── STATE ──
   let state = {
@@ -1390,18 +1394,18 @@
     const total = basePrice - state.promoDiscount;
 
     document.getElementById('summary-base-label').textContent = plan.name + ' Plan (' + (isYearly ? 'Yearly' : 'Monthly') + ')';
-    document.getElementById('summary-base-price').textContent = '$' + basePrice.toFixed(2);
+    document.getElementById('summary-base-price').textContent = currencySymbol + basePrice.toFixed(2);
 
     if (isYearly) {
       document.getElementById('discount-line').style.display = 'flex';
-      document.getElementById('summary-discount').textContent = '–$' + (discount * 12).toFixed(2) + '/yr';
+      document.getElementById('summary-discount').textContent = '–' + currencySymbol + (discount * 12).toFixed(2) + '/yr';
     } else {
       document.getElementById('discount-line').style.display = 'none';
     }
 
-    document.getElementById('summary-total').textContent = '$' + Math.max(0, total).toFixed(2).replace('.00','');
+    document.getElementById('summary-total').textContent = currencySymbol + Math.max(0, total).toFixed(2).replace('.00','');
     document.getElementById('summary-period').textContent = isYearly
-      ? 'per month · billed $' + (basePrice * 12).toFixed(0) + ' annually'
+      ? 'per month · billed ' + currencySymbol + (basePrice * 12).toFixed(0) + ' annually'
       : 'per month · cancel anytime';
   }
 
