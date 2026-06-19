@@ -246,8 +246,67 @@ function setupComparisonCategories() {
     });
 }
 
+// Mobile navbar toggle: injects a hamburger button and toggles the .mobile-open class
+function setupMobileNav() {
+  const nav = document.querySelector('nav');
+  if (!nav) return;
+
+  // don't re-create if present
+  if (nav.querySelector('.nav-toggle')) return;
+
+  const links = nav.querySelector('.nav-links');
+
+  const toggle = document.createElement('button');
+  toggle.className = 'nav-toggle';
+  toggle.setAttribute('aria-label', 'Toggle navigation');
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.innerHTML = '<span class="bar"></span><span class="bar"></span><span class="bar"></span>';
+
+  // Insert toggle before the links so it appears on the right on mobile
+  if (links) nav.insertBefore(toggle, links);
+  else nav.appendChild(toggle);
+
+  const closeMenu = () => {
+    if (!links) return;
+    links.classList.remove('mobile-open');
+    toggle.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  };
+
+  const openMenu = () => {
+    if (!links) return;
+    links.classList.toggle('mobile-open');
+    toggle.classList.toggle('open');
+    const expanded = toggle.classList.contains('open');
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  };
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openMenu();
+  });
+
+  // Close when clicking a link
+  if (links) {
+    links.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => setTimeout(closeMenu, 50));
+    });
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!nav.contains(e.target)) closeMenu();
+  });
+
+  // Close on escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initPricing();
     setupPricingCardSelection();
     setupComparisonCategories();
+  setupMobileNav();
 });

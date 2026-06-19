@@ -1319,6 +1319,48 @@ footer {
 @media (max-width: 768px) {
   nav { padding: 14px 16px; }
   .nav-links { display: none; }
+  /* Mobile hamburger toggle */
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    gap: 4px;
+  }
+  .nav-toggle .bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  .nav-toggle.open .bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav-toggle.open .bar:nth-child(2) { opacity: 0; }
+  .nav-toggle.open .bar:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* When menu is opened on mobile */
+  .nav-links.mobile-open {
+    display: flex !important;
+    position: absolute;
+    top: 64px;
+    right: 16px;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(8,10,20,0.98);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(212,160,23,0.08);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    z-index: 120;
+    min-width: 180px;
+  }
+  .nav-links.mobile-open a { padding: 8px 6px; }
+  nav { position: fixed; }
   .nav-logo { gap: 8px; }
   .nav-logo-icon { width: 32px; height: 32px; }
   .nav-logo-text { font-size: 16px; }
