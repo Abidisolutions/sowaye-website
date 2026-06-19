@@ -52,6 +52,21 @@ nav {
   box-sizing: border-box;
 }
 
+/* Mask tiny stray pixel that may appear behind the navbar */
+nav::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(13,16,32,0.95);
+  border-radius: 50%;
+  z-index: 110;
+  pointer-events: none;
+}
+
 .nav-logo {
   display: flex;
   align-items: center;
