@@ -823,6 +823,7 @@ section {
   position: relative;
   overflow: hidden;
   transition: all 0.3s;
+  cursor: pointer;
 }
 
 .pricing-card:hover {
@@ -830,23 +831,15 @@ section {
   border-color: rgba(212,160,23,0.2);
 }
 
-.pricing-card.featured {
+.pricing-card.selected-card {
   background: rgba(27,35,64,0.8);
   border-color: rgba(212,160,23,0.4);
 }
 
-.pricing-card.featured::before {
-  content: 'Most Popular';
-  position: absolute;
-  top: 20px;
-  right: 20px;
+.pricing-card.selected-card .pricing-btn {
   background: var(--gold);
   color: var(--navy);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  padding: 5px 12px;
-  border-radius: 100px;
+  border-color: var(--gold);
 }
 
 .pricing-tier {

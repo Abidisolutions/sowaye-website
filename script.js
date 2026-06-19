@@ -207,6 +207,30 @@ function toggleComparisonTable() {
         : 'Show Comparison Table <span id="arrow">▸</span>';
 }
 
+function setupPricingCardSelection() {
+    const cards = document.querySelectorAll('.pricing-card[data-plan]');
+    if (!cards.length) return;
+
+    const selectCard = (selectedCard) => {
+        cards.forEach(card => {
+            const button = card.querySelector('.pricing-btn');
+            const isSelected = card === selectedCard;
+            card.classList.toggle('selected-card', isSelected);
+            if (button) {
+                button.classList.toggle('pricing-btn-solid', isSelected);
+                button.classList.toggle('pricing-btn-outline', !isSelected);
+            }
+        });
+    };
+
+    cards.forEach(card => {
+        card.addEventListener('click', () => selectCard(card));
+    });
+
+    const initial = document.querySelector('.pricing-card.selected-card[data-plan]') || cards[0];
+    selectCard(initial);
+}
+
 function setupComparisonCategories() {
     const categories = document.querySelectorAll('.comparison-category');
     categories.forEach(category => {
@@ -223,5 +247,6 @@ function setupComparisonCategories() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initPricing();
+    setupPricingCardSelection();
     setupComparisonCategories();
 });
