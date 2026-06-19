@@ -1187,6 +1187,13 @@ footer {
   transition: all 0.3s;
 }
 
+.product-feature-icon svg,
+.feature-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--gold);
+}
+
 .product-feature-row:hover .product-feature-icon {
   background: rgba(212,160,23,0.18);
   border-color: rgba(212,160,23,0.35);
