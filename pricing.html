@@ -389,62 +389,64 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const api_url = 'http://ip-api.com/json/?fields=status,message,country,countryCode,currency';
+    const asianCountries = new Set([
+        'AF','AM','AZ','BH','BD','BT','BN','KH','CN','CY','GE','IN','ID','IR','IQ','IL','JP','JO','KZ','KW','KG','LA','LB','MY','MV','MN','MM','NP','KP','OM','PK','PS','PH','QA','SA','SG','KR','LK','SY','TW','TJ','TH','TR','TM','AE','UZ','VN','YE'
+    ]);
+    const currencySymbols = {
+        USD: '$', GBP: '£', EUR: '€', AED: 'د.إ', CAD: '$', AUD: '$', NZD: '$', PKR: 'Rs.', INR: '₹', JPY: '¥', CNY: '¥', SGD: '$', SAR: '﷼', TRY: '₺', KRW: '₩', ZAR: 'R'
+    };
 
     async function getPricing() {
         try {
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 5000); 
+            const id = setTimeout(() => controller.abort(), 5000);
 
             const response = await fetch(api_url, { signal: controller.signal });
             const data = await response.json();
             clearTimeout(id);
 
             if (data.status === 'success') {
-                if (data.countryCode === 'PK') {
-                    applyPrices(2800, 5600, "Rs.", "Pakistan Region", data.country);
+                const symbol = currencySymbols[data.currency] || '$';
+                const countryCode = data.countryCode || 'US';
+                const countryName = data.country || 'International';
+
+                if (asianCountries.has(countryCode)) {
+                    applyPrices(10, 25, symbol, 'Asian Pricing', countryName, countryCode);
                 } else {
-                    applyPrices(20, 35, "$", "Global Region", data.country);
+                    applyPrices(20, 35, symbol, 'International Pricing', countryName, countryCode);
                 }
             } else {
                 throw new Error('API failed');
             }
         } catch (error) {
-            applyPrices(20, 35, "$", "Global", "Default");
+            applyPrices(20, 35, '$', 'International', 'Default', 'US');
         }
     }
 
-    function applyPrices(starter, pro, symbol, region, country) {
-        // UI Prices Update
+    function applyPrices(starter, pro, symbol, region, country, countryCode) {
         const s_el = document.getElementById('starter-price');
         const p_el = document.getElementById('pro-price');
-        if(s_el) s_el.innerText = starter;
-        if(p_el) p_el.innerText = pro;
-        
-        // Symbols Update
-        const starterSymbolEl = document.getElementById('starter-currency-symbol');
-        const proSymbolEl = document.getElementById('pro-currency-symbol');
-        if(starterSymbolEl) starterSymbolEl.innerText = symbol;
-        if(proSymbolEl) proSymbolEl.innerText = symbol;
+        if (s_el) s_el.innerText = `${symbol}${starter}`;
+        if (p_el) p_el.innerText = `${symbol}${pro}`;
 
         const compStarter = document.getElementById('comp-starter-price');
         const compPro = document.getElementById('comp-pro-price');
-        if(compStarter) compStarter.innerText = symbol + starter;
-        if(compPro) compPro.innerText = symbol + pro;
-        
-        // 🔴 MAIN LOGIC: Update ALL checkout links on the page
+        if (compStarter) compStarter.innerText = `${symbol}${starter}`;
+        if (compPro) compPro.innerText = `${symbol}${pro}`;
+
         const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
         allCheckoutLinks.forEach(link => {
             const url = new URL(link.href, window.location.origin);
             const plan = url.searchParams.get('plan') || 'starter';
-            // Ye line URL mein Rs aur 2800/5600 add karti hai
-            link.href = `checkout.html?plan=${plan}&s_p=${starter}&p_p=${pro}&cur=${encodeURIComponent(symbol)}`;
+            link.href = `checkout.html?plan=${plan}&starter=${starter}&professional=${pro}&currency=${encodeURIComponent(symbol)}&country=${encodeURIComponent(countryCode)}`;
         });
 
         const badge = document.getElementById('location-badge');
-        if(badge) {
-            badge.innerText = `${region} Active (${country})`;
-            badge.style.background = "rgba(40, 167, 69, 0.15)"; 
-            badge.style.color = "#28a745";
+        if (badge) {
+            badge.innerText = `${country} pricing active`;
+            badge.title = `${region} — ${country}`;
+            badge.style.background = 'rgba(234,179,8,0.18)';
+            badge.style.color = '#F0C040';
         }
     }
 
