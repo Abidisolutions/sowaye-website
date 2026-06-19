@@ -388,7 +388,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const api_url = 'http://ip-api.com/json/?fields=status,message,country,countryCode,currency';
+    const api_url = 'https://ipapi.co/json/';
     const asianCountries = new Set([
         'AF','AM','AZ','BH','BD','BT','BN','KH','CN','CY','GE','IN','ID','IR','IQ','IL','JP','JO','KZ','KW','KG','LA','LB','MY','MV','MN','MM','NP','KP','OM','PK','PS','PH','QA','SA','SG','KR','LK','SY','TW','TJ','TH','TR','TM','AE','UZ','VN','YE'
     ]);
@@ -404,26 +404,23 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(api_url, { signal: controller.signal });
             const data = await response.json();
             clearTimeout(id);
+            // ipapi.co returns: { country_name, country_code, currency }
+            const currencyCode = data.currency || 'USD';
+            const symbol = currencySymbols[currencyCode] || '$';
+            const countryCode = (data.country_code || 'US').toUpperCase();
+            const countryName = data.country_name || 'International';
 
-            if (data.status === 'success') {
-                const symbol = currencySymbols[data.currency] || '$';
-                const countryCode = data.countryCode || 'US';
-                const countryName = data.country || 'International';
-
-                if (asianCountries.has(countryCode)) {
-                    applyPrices(10, 25, symbol, 'Asian Pricing', countryName, countryCode);
-                } else {
-                    applyPrices(20, 35, symbol, 'International Pricing', countryName, countryCode);
-                }
+            if (asianCountries.has(countryCode)) {
+              applyPrices(10, 25, symbol, 'Asian Pricing', countryName, countryCode, currencyCode);
             } else {
-                throw new Error('API failed');
+              applyPrices(20, 35, symbol, 'International Pricing', countryName, countryCode, currencyCode);
             }
         } catch (error) {
-            applyPrices(20, 35, '$', 'International', 'Default', 'US');
+            applyPrices(20, 35, '$', 'International', 'Default', 'US', 'USD');
         }
     }
 
-    function applyPrices(starter, pro, symbol, region, country, countryCode) {
+        function applyPrices(starter, pro, symbol, region, country, countryCode, currencyCode) {
         const s_el = document.getElementById('starter-price');
         const p_el = document.getElementById('pro-price');
         if (s_el) s_el.innerText = `${symbol}${starter}`;
@@ -436,9 +433,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
         allCheckoutLinks.forEach(link => {
-            const url = new URL(link.href, window.location.origin);
-            const plan = url.searchParams.get('plan') || 'starter';
-            link.href = `checkout.html?plan=${plan}&starter=${starter}&professional=${pro}&currency=${encodeURIComponent(symbol)}&country=${encodeURIComponent(countryCode)}`;
+          const url = new URL(link.href, window.location.origin);
+          const plan = url.searchParams.get('plan') || 'starter';
+          // Pass both numeric prices and currency code for reliable handling on checkout
+          link.href = `checkout.html?plan=${plan}&starter=${starter}&professional=${pro}&currency=${encodeURIComponent(currencyCode)}&symbol=${encodeURIComponent(symbol)}&country=${encodeURIComponent(countryCode)}`;
         });
 
         const badge = document.getElementById('location-badge');
