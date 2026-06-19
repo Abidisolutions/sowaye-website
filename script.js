@@ -250,57 +250,76 @@ function setupComparisonCategories() {
 function setupMobileNav() {
   const nav = document.querySelector('nav');
   if (!nav) return;
-
-  // don't re-create if present
-  if (nav.querySelector('.nav-toggle')) return;
-
   const links = nav.querySelector('.nav-links');
 
-  const toggle = document.createElement('button');
-  toggle.className = 'nav-toggle';
-  toggle.setAttribute('aria-label', 'Toggle navigation');
-  toggle.setAttribute('aria-expanded', 'false');
-  toggle.innerHTML = '<span class="bar"></span><span class="bar"></span><span class="bar"></span>';
+  // Create or remove toggle depending on viewport width
+  const ensureToggle = () => {
+    const existing = nav.querySelector('.nav-toggle');
+    if (window.innerWidth <= 768) {
+      if (existing) return existing;
+      const toggle = document.createElement('button');
+      toggle.className = 'nav-toggle';
+      toggle.setAttribute('aria-label', 'Toggle navigation');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.innerHTML = '<span class="bar"></span><span class="bar"></span><span class="bar"></span>';
+      if (links) nav.insertBefore(toggle, links);
+      else nav.appendChild(toggle);
 
-  // Insert toggle before the links so it appears on the right on mobile
-  if (links) nav.insertBefore(toggle, links);
-  else nav.appendChild(toggle);
+      const closeMenu = () => {
+        if (!links) return;
+        links.classList.remove('mobile-open');
+        toggle.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      };
 
-  const closeMenu = () => {
-    if (!links) return;
-    links.classList.remove('mobile-open');
-    toggle.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
+      const openMenu = () => {
+        if (!links) return;
+        links.classList.toggle('mobile-open');
+        toggle.classList.toggle('open');
+        const expanded = toggle.classList.contains('open');
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      };
+
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMenu();
+      });
+
+      if (links) {
+        links.querySelectorAll('a').forEach(a => {
+          a.addEventListener('click', () => setTimeout(closeMenu, 50));
+        });
+      }
+
+      // Close when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!nav.contains(e.target)) closeMenu();
+      });
+
+      // Close on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+      });
+
+      return toggle;
+    } else {
+      if (existing) {
+        // remove existing toggle and any mobile-open class
+        existing.remove();
+        if (links) links.classList.remove('mobile-open');
+      }
+      return null;
+    }
   };
 
-  const openMenu = () => {
-    if (!links) return;
-    links.classList.toggle('mobile-open');
-    toggle.classList.toggle('open');
-    const expanded = toggle.classList.contains('open');
-    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  };
+  // initial
+  ensureToggle();
 
-  toggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openMenu();
-  });
-
-  // Close when clicking a link
-  if (links) {
-    links.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => setTimeout(closeMenu, 50));
-    });
-  }
-
-  // Close when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!nav.contains(e.target)) closeMenu();
-  });
-
-  // Close on escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeMenu();
+  // update on resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => ensureToggle(), 120);
   });
 }
 

@@ -52,6 +52,9 @@ nav {
   box-sizing: border-box;
 }
 
+/* Hide mobile toggle by default; shown only in mobile media query */
+.nav-toggle { display: none; }
+
 /* Mask tiny stray pixel that may appear behind the navbar */
 nav::after {
   content: '';
