@@ -863,13 +863,7 @@
 
           <div class="payment-methods">
             <div class="payment-method-tab active" data-method="card">
-              <span class="pm-icon">💳</span> Credit Card
-            </div>
-            <div class="payment-method-tab" data-method="paypal">
-              <span class="pm-icon">🅿</span> PayPal
-            </div>
-            <div class="payment-method-tab" data-method="bank">
-              <span class="pm-icon">🏦</span> Bank Transfer
+              <span class="pm-icon">💳</span> Card
             </div>
           </div>
 
@@ -901,24 +895,6 @@
               <div class="form-group">
                 <label>CVV</label>
                 <input type="text" id="card-cvv" placeholder="123" maxlength="4" autocomplete="cc-csc">
-              </div>
-            </div>
-          </div>
-
-          <div class="payment-panel" id="panel-paypal">
-            <div style="text-align: center; padding: 36px 20px; background: rgba(27,35,64,0.4); border-radius: 10px; border: 1px solid rgba(255,255,255,0.07);">
-              <div style="font-size: 36px; margin-bottom: 14px;">🅿</div>
-              <p style="font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 8px;">You'll be redirected to PayPal to complete your payment securely.</p>
-              <p style="font-size: 12px; color: rgba(255,255,255,0.3);">No PayPal account? You can pay with a debit or credit card through PayPal.</p>
-            </div>
-          </div>
-
-          <div class="payment-panel" id="panel-bank">
-            <div style="padding: 24px; background: rgba(27,35,64,0.4); border-radius: 10px; border: 1px solid rgba(255,255,255,0.07);">
-              <p style="font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 16px; line-height: 1.6;">Our team will send you bank transfer details via email after you complete this form. Your subscription will be activated once payment is confirmed (1–2 business days).</p>
-              <div class="form-group">
-                <label>Purchase Order Number (optional)</label>
-                <input type="text" placeholder="PO-2025-0001">
               </div>
             </div>
           </div>
@@ -1409,17 +1385,6 @@
       : 'per month · cancel anytime';
   }
 
-  // ── PAYMENT METHOD TABS ──
-  document.querySelectorAll('.payment-method-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.payment-method-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.payment-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      const panel = document.getElementById('panel-' + tab.dataset.method);
-      if (panel) panel.classList.add('active');
-    });
-  });
-
   // ── CARD NUMBER FORMATTING ──
   const cardInput = document.getElementById('card-number');
   if (cardInput) {
@@ -1459,28 +1424,110 @@
     updateSummary();
   };
 
+  function isBusinessEmail(email) {
+    const freeDomains = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','mail.com','protonmail.com','yandex.com','gmx.com','zoho.com'];
+    const parts = email.toLowerCase().split('@');
+    if (parts.length !== 2) return false;
+    const domain = parts[1].trim();
+    if (!domain || !domain.includes('.')) return false;
+    return !freeDomains.some(free => domain === free || domain.endsWith('.' + free));
+  }
+
+  function isValidPassword(password) {
+    return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+  }
+
+  function isValidLuhn(number) {
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = number.length - 1; i >= 0; i--) {
+      let digit = parseInt(number.charAt(i), 10);
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+    return sum % 10 === 0;
+  }
+
+  function isValidCardNumber(value) {
+    if (!/^[0-9]{15,19}$/.test(value)) return false;
+    if (/^(\d)\1+$/.test(value)) return false;
+    const blocked = ['1234567812345678','0000000000000000','1111111111111111','2222222222222222','3333333333333333','4444444444444444','5555555555555555','6666666666666666','7777777777777777','8888888888888888','9999999999999999'];
+    if (blocked.includes(value)) return false;
+    return isValidLuhn(value);
+  }
+
+  function isValidExpiry(value) {
+    const cleaned = value.replace(/\s|\//g, '');
+    if (!/^[0-9]{4}$/.test(cleaned)) return false;
+    const month = parseInt(cleaned.slice(0,2), 10);
+    const year = parseInt(cleaned.slice(2), 10) + 2000;
+    if (month < 1 || month > 12) return false;
+    const now = new Date();
+    const expiryDate = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    return lastDay >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
   // ── FORM VALIDATION ──
   function validateForm() {
     const requiredFields = ['first-name', 'last-name', 'email', 'company', 'password'];
-    const activeMethod = document.querySelector('.payment-method-tab.active')?.dataset.method;
 
     for (const id of requiredFields) {
       const el = document.getElementById(id);
       if (!el || !el.value.trim()) {
         el?.focus();
         el?.style.setProperty('border-color', '#E2574A');
+        alert('Please fill in all required fields.');
         return false;
       }
       el.style.borderColor = '';
     }
 
-    if (activeMethod === 'card') {
-      const cn = document.getElementById('card-number')?.value.replace(/\s/g,'');
-      const exp = document.getElementById('card-expiry')?.value;
-      const cvv = document.getElementById('card-cvv')?.value;
-      if (!cn || cn.length < 15) { alert('Please enter a valid card number.'); return false; }
-      if (!exp || exp.length < 4) { alert('Please enter a valid expiry date.'); return false; }
-      if (!cvv || cvv.length < 3) { alert('Please enter a valid CVV.'); return false; }
+    const email = document.getElementById('email').value.trim();
+    if (!isBusinessEmail(email)) {
+      alert('Please use a work email address, not a free provider.');
+      document.getElementById('email').focus();
+      return false;
+    }
+
+    const password = document.getElementById('password').value;
+    if (!isValidPassword(password)) {
+      alert('Password must be at least 8 characters long and include both letters and numbers.');
+      document.getElementById('password').focus();
+      return false;
+    }
+
+    const cardName = document.getElementById('card-name')?.value.trim();
+    const cardNumber = document.getElementById('card-number')?.value.replace(/\s/g,'');
+    const expiry = document.getElementById('card-expiry')?.value;
+    const cvv = document.getElementById('card-cvv')?.value;
+
+    if (!cardName || /[^a-zA-Z\s'\-]/.test(cardName)) {
+      alert('Please enter a valid cardholder name.');
+      document.getElementById('card-name').focus();
+      return false;
+    }
+
+    if (!isValidCardNumber(cardNumber)) {
+      alert('Please enter a valid card number.');
+      document.getElementById('card-number').focus();
+      return false;
+    }
+
+    if (!isValidExpiry(expiry)) {
+      alert('Please enter a valid expiry date in MM / YY format and ensure it is not expired.');
+      document.getElementById('card-expiry').focus();
+      return false;
+    }
+
+    if (!/^[0-9]{3,4}$/.test(cvv)) {
+      alert('Please enter a valid CVV.');
+      document.getElementById('card-cvv').focus();
+      return false;
     }
 
     if (!document.getElementById('terms-check')?.checked) {
