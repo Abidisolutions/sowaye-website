@@ -1169,11 +1169,20 @@
       : 'per month · cancel anytime';
   }
 
+  function handlePlanClick(plan) {
+    if (plan === 'enterprise') {
+      alert('Enterprise packages are custom. You will now be redirected to our support team.');
+      window.location.href = 'mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request';
+      return;
+    }
+    state.plan = plan;
+    markSelectedPlan();
+    updateSummary();
+  }
+
   planOptions.forEach(opt => {
     opt.addEventListener('click', () => {
-      state.plan = opt.dataset.plan;
-      markSelectedPlan();
-      updateSummary();
+      handlePlanClick(opt.dataset.plan);
     });
   });
 
@@ -1292,13 +1301,23 @@
 
   // ── PLAN SWITCHER ──
   const planOptions = document.querySelectorAll('.plan-option');
+  function handlePlanClick(plan) {
+    if (plan === 'enterprise') {
+      alert('Enterprise packages are custom. You will now be redirected to our support team.');
+      window.location.href = 'mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request';
+      return;
+    }
+    planOptions.forEach(o => o.classList.remove('selected'));
+    const selected = Array.from(planOptions).find(o => o.dataset.plan === plan);
+    if (selected) selected.classList.add('selected');
+    state.plan = plan;
+    updateSummary();
+  }
+
   planOptions.forEach(opt => {
     if (opt.dataset.plan === state.plan) opt.classList.add('selected');
     opt.addEventListener('click', () => {
-      planOptions.forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      state.plan = opt.dataset.plan;
-      updateSummary();
+      handlePlanClick(opt.dataset.plan);
     });
   });
 
@@ -1540,6 +1559,12 @@
 
   // ── CHECKOUT SUBMIT ──
   window.handleCheckout = async function() {
+    if (state.plan === 'enterprise') {
+      alert('Enterprise packages are custom. Please contact our support team to configure your package.');
+      window.location.href = 'mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request';
+      return;
+    }
+
     if (!validateForm()) return;
 
     const btn = document.getElementById('submit-btn');
