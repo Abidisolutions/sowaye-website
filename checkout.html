@@ -1149,23 +1149,25 @@
     document.querySelector('#submit-btn .btn-text').innerHTML = '🔒 &nbsp;Complete Purchase';
     document.getElementById('submit-note-text').textContent = '14-day free trial included. Cancel anytime.';
 
-    const basePrice = isYearly ? plan.yearly : plan.monthly;
-    const discount = isYearly ? (plan.monthly - plan.yearly) : 0;
-    const total = Math.max(0, basePrice - state.promoDiscount);
+    const monthlyBase = plan.monthly;
+    const yearlyMonthlyEquivalent = isYearly ? (plan.yearly || monthlyBase * 0.8) : monthlyBase;
+    const annualTotal = isYearly ? yearlyMonthlyEquivalent * 12 : monthlyBase;
+    const annualSavings = isYearly ? (monthlyBase * 12 - annualTotal) : 0;
+    const total = Math.max(0, annualTotal - state.promoDiscount);
 
     document.getElementById('summary-base-label').textContent = plan.name + ' Plan (' + (isYearly ? 'Yearly' : 'Monthly') + ')';
-    document.getElementById('summary-base-price').textContent = currencySymbol + basePrice.toFixed(0);
+    document.getElementById('summary-base-price').textContent = currencySymbol + yearlyMonthlyEquivalent.toFixed(0);
 
     if (isYearly) {
       document.getElementById('discount-line').style.display = 'flex';
-      document.getElementById('summary-discount').textContent = '–' + currencySymbol + (discount * 12).toFixed(0) + '/yr';
+      document.getElementById('summary-discount').textContent = '–' + currencySymbol + annualSavings.toFixed(0) + '/yr';
     } else {
       document.getElementById('discount-line').style.display = 'none';
     }
 
     document.getElementById('summary-total').textContent = currencySymbol + total.toFixed(0);
     document.getElementById('summary-period').textContent = isYearly
-      ? 'per month · billed ' + currencySymbol + (basePrice * 12).toFixed(0) + ' annually'
+      ? 'per month · billed ' + currencySymbol + annualTotal.toFixed(0) + ' annually'
       : 'per month · cancel anytime';
   }
 
@@ -1384,23 +1386,25 @@
     document.getElementById('submit-btn').querySelector('.btn-text').innerHTML = '🔒 &nbsp;Complete Purchase';
     document.getElementById('submit-note-text').textContent = '14-day free trial included. Cancel anytime.';
 
-    const basePrice = isYearly ? plan.yearly : plan.monthly;
-    const discount = isYearly ? (plan.monthly - plan.yearly) : 0;
-    const total = basePrice - state.promoDiscount;
+    const monthlyBase = plan.monthly;
+    const yearlyMonthlyEquivalent = isYearly ? (plan.yearly || monthlyBase * 0.8) : monthlyBase;
+    const annualTotal = isYearly ? yearlyMonthlyEquivalent * 12 : monthlyBase;
+    const annualSavings = isYearly ? (monthlyBase * 12 - annualTotal) : 0;
+    const total = Math.max(0, annualTotal - state.promoDiscount);
 
     document.getElementById('summary-base-label').textContent = plan.name + ' Plan (' + (isYearly ? 'Yearly' : 'Monthly') + ')';
-    document.getElementById('summary-base-price').textContent = currencySymbol + basePrice.toFixed(2);
+    document.getElementById('summary-base-price').textContent = currencySymbol + yearlyMonthlyEquivalent.toFixed(2).replace('.00','');
 
     if (isYearly) {
       document.getElementById('discount-line').style.display = 'flex';
-      document.getElementById('summary-discount').textContent = '–' + currencySymbol + (discount * 12).toFixed(2) + '/yr';
+      document.getElementById('summary-discount').textContent = '–' + currencySymbol + annualSavings.toFixed(2).replace('.00','') + '/yr';
     } else {
       document.getElementById('discount-line').style.display = 'none';
     }
 
     document.getElementById('summary-total').textContent = currencySymbol + Math.max(0, total).toFixed(2).replace('.00','');
     document.getElementById('summary-period').textContent = isYearly
-      ? 'per month · billed ' + currencySymbol + (basePrice * 12).toFixed(0) + ' annually'
+      ? 'per month · billed ' + currencySymbol + annualTotal.toFixed(0) + ' annually'
       : 'per month · cancel anytime';
   }
 
