@@ -96,7 +96,7 @@
 
     <div class="pricing-card" data-plan="enterprise">
       <p class="pricing-tier">Enterprise</p>
-      <p class="pricing-price">Custom</p>
+      <p class="pricing-price" id="enterprise-price">Custom</p>
       <p class="pricing-period">for unlimited users</p>
       <div class="pricing-divider"></div>
       <ul class="pricing-features">
@@ -107,7 +107,7 @@
         <li>Custom integrations</li>
         <li>SLA & priority support</li>
       </ul>
-      <a href="checkout.html?plan=enterprise" class="pricing-btn pricing-btn-outline">Contact sales</a>
+      <a href="mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request" id="enterprise-btn" class="pricing-btn pricing-btn-outline">Contact sales</a>
     </div>
   </div>
 </section>
@@ -141,9 +141,9 @@
           </div>
           <div class="header-col">
             <span class="tier-label">ENTERPRISE</span>
-            <span class="tier-price">Custom</span>
+            <span class="tier-price" id="comp-enterprise-price">Custom</span>
             <span class="tier-users">Unlimited users</span>
-            <a href="checkout.html?plan=enterprise" class="btn-table-outline">Contact Sales</a>
+            <a href="mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request" id="comp-enterprise-link" class="btn-table-outline">Contact Sales</a>
           </div>
         </div>
 
@@ -480,6 +480,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  function applyEnterpriseCustomState() {
+    const enterprisePriceEls = [
+      document.getElementById('enterprise-price'),
+      document.getElementById('comp-enterprise-price')
+    ];
+
+    enterprisePriceEls.forEach(el => {
+      if (el) el.textContent = 'Custom';
+    });
+
+    const enterpriseLinks = [
+      document.getElementById('enterprise-btn'),
+      document.getElementById('comp-enterprise-link')
+    ];
+
+    enterpriseLinks.forEach(link => {
+      if (!link || link.dataset.customBound === 'true') return;
+      link.dataset.customBound = 'true';
+      link.href = 'mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request';
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        alert('Enterprise packages are custom. You will now be redirected to our support team.');
+        window.location.href = 'mailto:hello@sowaye.com?subject=Enterprise%20Package%20Request';
+      });
+    });
+  }
+
   function applyPrices(baseStarterUsd, baseProUsd, localStarter, localPro, symbol, region, country, countryCode, currencyCode) {
     const s_el = document.getElementById('starter-price');
     const p_el = document.getElementById('pro-price');
@@ -510,6 +537,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const compPro = document.getElementById('comp-pro-price');
     if (compStarter) compStarter.innerText = starterText;
     if (compPro) compPro.innerText = proText;
+
+    applyEnterpriseCustomState();
 
     const allCheckoutLinks = document.querySelectorAll('a[href*="checkout.html"]');
     allCheckoutLinks.forEach(link => {
