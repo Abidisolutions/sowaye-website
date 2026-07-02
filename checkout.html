@@ -310,6 +310,28 @@
     box-shadow: 0 0 0 3px rgba(212,160,23,0.08);
   }
 
+  .form-group input.input-error,
+  .form-group select.input-error {
+    border-color: #E2574A;
+    background: rgba(226,87,74,0.08);
+  }
+
+  .form-group input.input-valid,
+  .form-group select.input-valid {
+    border-color: #4CAF7D;
+    background: rgba(76,175,125,0.08);
+  }
+
+  .form-error-msg {
+    font-size: 12px;
+    color: #E2574A;
+    margin-top: 4px;
+    display: none;
+    line-height: 1.4;
+  }
+
+  .form-error-msg.show { display: block; }
+
   .form-group select option { background: #1B2340; color: white; }
 
   /* ── PAYMENT METHODS ── */
@@ -818,16 +840,19 @@
             <div class="form-group">
               <label>First Name</label>
               <input type="text" id="first-name" placeholder="John" autocomplete="given-name">
+              <div class="form-error-msg" id="error-first-name"></div>
             </div>
             <div class="form-group">
               <label>Last Name</label>
               <input type="text" id="last-name" placeholder="Smith" autocomplete="family-name">
+              <div class="form-error-msg" id="error-last-name"></div>
             </div>
           </div>
           <div class="form-row single">
             <div class="form-group">
               <label>Work Email</label>
               <input type="email" id="email" placeholder="john@company.com" autocomplete="email">
+              <div class="form-error-msg" id="error-email"></div>
             </div>
           </div>
           <div class="form-row">
@@ -851,6 +876,7 @@
             <div class="form-group">
               <label>Password</label>
               <input type="password" id="password" placeholder="Create a strong password">
+              <div class="form-error-msg" id="error-password"></div>
             </div>
           </div>
         </div>
@@ -872,6 +898,7 @@
               <div class="form-group">
                 <label>Cardholder Name</label>
                 <input type="text" id="card-name" placeholder="John Smith" autocomplete="cc-name">
+                <div class="form-error-msg" id="error-card-name"></div>
               </div>
             </div>
             <div class="form-row single">
@@ -885,16 +912,19 @@
                     <div class="card-brand-chip chip-mc">MC</div>
                   </div>
                 </div>
+                <div class="form-error-msg" id="error-card-number"></div>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Expiry Date</label>
                 <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp">
+                <div class="form-error-msg" id="error-card-expiry"></div>
               </div>
               <div class="form-group">
                 <label>CVV</label>
                 <input type="text" id="card-cvv" placeholder="123" maxlength="4" autocomplete="cc-csc">
+                <div class="form-error-msg" id="error-card-cvv"></div>
               </div>
             </div>
           </div>
@@ -1409,11 +1439,73 @@
   }
 
   // ── CARD NUMBER FORMATTING ──
+  function validateEmail() {
+    const field = document.getElementById('email');
+    if (!field) return true;
+    const value = field.value.trim();
+    if (!value) {
+      showFieldError('email', 'Email is required.');
+      return false;
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+      showFieldError('email', 'Please enter a valid email address.');
+      return false;
+    }
+    if (!isBusinessEmail(value)) {
+      showFieldError('email', 'Please use a work email (not Gmail, Yahoo, etc.).');
+      return false;
+    }
+    clearFieldError('email');
+    return true;
+  }
+
+  document.getElementById('email')?.addEventListener('blur', validateEmail);
+  document.getElementById('email')?.addEventListener('input', validateEmail);
+
+  function validatePassword() {
+    const field = document.getElementById('password');
+    if (!field) return true;
+    const value = field.value;
+    if (!value) {
+      showFieldError('password', 'Password is required.');
+      return false;
+    }
+    if (value.length < 8) {
+      showFieldError('password', 'Password must be at least 8 characters.');
+      return false;
+    }
+    if (!/[A-Za-z]/.test(value)) {
+      showFieldError('password', 'Password must include letters.');
+      return false;
+    }
+    if (!/\d/.test(value)) {
+      showFieldError('password', 'Password must include numbers.');
+      return false;
+    }
+    clearFieldError('password');
+    return true;
+  }
+
+  document.getElementById('password')?.addEventListener('blur', validatePassword);
+  document.getElementById('password')?.addEventListener('input', validatePassword);
+
   const cardInput = document.getElementById('card-number');
   if (cardInput) {
     cardInput.addEventListener('input', (e) => {
       let val = e.target.value.replace(/\D/g, '').substring(0, 16);
       e.target.value = val.replace(/(.{4})/g, '$1 ').trim();
+    });
+    cardInput.addEventListener('blur', () => {
+      const cleaned = cardInput.value.replace(/\s/g, '');
+      if (!cleaned) {
+        showFieldError('card-number', 'Card number is required.');
+      } else if (!/^[0-9]{15,16}$/.test(cleaned)) {
+        showFieldError('card-number', 'Card number must be 15-16 digits.');
+      } else if (!isValidLuhn(cleaned)) {
+        showFieldError('card-number', 'Invalid card number.');
+      } else {
+        clearFieldError('card-number');
+      }
     });
   }
 
@@ -1423,6 +1515,41 @@
       let val = e.target.value.replace(/\D/g, '').substring(0, 4);
       if (val.length >= 2) val = val.slice(0,2) + ' / ' + val.slice(2);
       e.target.value = val;
+    });
+    expiryInput.addEventListener('blur', () => {
+      if (!isValidExpiry(expiryInput.value)) {
+        showFieldError('card-expiry', 'Invalid expiry date or card expired.');
+      } else {
+        clearFieldError('card-expiry');
+      }
+    });
+  }
+
+  const cvvInput = document.getElementById('card-cvv');
+  if (cvvInput) {
+    cvvInput.addEventListener('blur', () => {
+      const value = cvvInput.value;
+      if (!value) {
+        showFieldError('card-cvv', 'CVV is required.');
+      } else if (!/^[0-9]{3,4}$/.test(value)) {
+        showFieldError('card-cvv', 'CVV must be 3-4 digits.');
+      } else {
+        clearFieldError('card-cvv');
+      }
+    });
+  }
+
+  const cardNameInput = document.getElementById('card-name');
+  if (cardNameInput) {
+    cardNameInput.addEventListener('blur', () => {
+      const value = cardNameInput.value.trim();
+      if (!value) {
+        showFieldError('card-name', 'Cardholder name is required.');
+      } else if (/[^a-zA-Z\s'\-]/.test(value)) {
+        showFieldError('card-name', 'Only letters, spaces, hyphens and apostrophes allowed.');
+      } else {
+        clearFieldError('card-name');
+      }
     });
   }
 
@@ -1495,70 +1622,111 @@
     return lastDay >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }
 
+  function showFieldError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.getElementById('error-' + fieldId);
+    if (field && errorEl) {
+      field.classList.add('input-error');
+      field.classList.remove('input-valid');
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+  }
+
+  function clearFieldError(fieldId) {
+    const field = document.getElementById(fieldId);
+    const errorEl = document.getElementById('error-' + fieldId);
+    if (field && errorEl) {
+      field.classList.remove('input-error');
+      field.classList.add('input-valid');
+      errorEl.classList.remove('show');
+    }
+  }
+
+  function validateName(id) {
+    const field = document.getElementById(id);
+    if (!field) return true;
+    const value = field.value.trim();
+    if (!value) {
+      showFieldError(id, 'This field is required.');
+      return false;
+    }
+    if (!/^[a-zA-Z\s\-']+$/.test(value)) {
+      showFieldError(id, 'Only letters, spaces, hyphens and apostrophes allowed.');
+      return false;
+    }
+    clearFieldError(id);
+    return true;
+  }
+
+  document.getElementById('first-name')?.addEventListener('blur', () => validateName('first-name'));
+  document.getElementById('last-name')?.addEventListener('blur', () => validateName('last-name'));
+
   // ── FORM VALIDATION ──
   function validateForm() {
+    let isValid = true;
     const requiredFields = ['first-name', 'last-name', 'email', 'company', 'password'];
 
     for (const id of requiredFields) {
       const el = document.getElementById(id);
       if (!el || !el.value.trim()) {
-        el?.focus();
-        el?.style.setProperty('border-color', '#E2574A');
-        alert('Please fill in all required fields.');
-        return false;
+        showFieldError(id, 'This field is required.');
+        isValid = false;
       }
-      el.style.borderColor = '';
     }
 
-    const email = document.getElementById('email').value.trim();
-    if (!isBusinessEmail(email)) {
-      alert('Please use a work email address, not a free provider.');
-      document.getElementById('email').focus();
-      return false;
-    }
-
-    const password = document.getElementById('password').value;
-    if (!isValidPassword(password)) {
-      alert('Password must be at least 8 characters long and include both letters and numbers.');
-      document.getElementById('password').focus();
-      return false;
-    }
+    if (!validateName('first-name')) isValid = false;
+    if (!validateName('last-name')) isValid = false;
+    if (!validateEmail()) isValid = false;
+    if (!validatePassword()) isValid = false;
 
     const cardName = document.getElementById('card-name')?.value.trim();
     const cardNumber = document.getElementById('card-number')?.value.replace(/\s/g,'');
     const expiry = document.getElementById('card-expiry')?.value;
     const cvv = document.getElementById('card-cvv')?.value;
 
-    if (!cardName || /[^a-zA-Z\s'\-]/.test(cardName)) {
-      alert('Please enter a valid cardholder name.');
-      document.getElementById('card-name').focus();
-      return false;
+    if (!cardName) {
+      showFieldError('card-name', 'Cardholder name is required.');
+      isValid = false;
+    } else if (/[^a-zA-Z\s'\-]/.test(cardName)) {
+      showFieldError('card-name', 'Only letters, spaces, hyphens and apostrophes allowed.');
+      isValid = false;
     }
 
-    if (!isValidCardNumber(cardNumber)) {
-      alert('Please enter a valid card number.');
-      document.getElementById('card-number').focus();
-      return false;
+    if (!cardNumber) {
+      showFieldError('card-number', 'Card number is required.');
+      isValid = false;
+    } else if (!isValidCardNumber(cardNumber)) {
+      showFieldError('card-number', 'Invalid card number.');
+      isValid = false;
     }
 
-    if (!isValidExpiry(expiry)) {
-      alert('Please enter a valid expiry date in MM / YY format and ensure it is not expired.');
-      document.getElementById('card-expiry').focus();
-      return false;
+    if (!expiry) {
+      showFieldError('card-expiry', 'Expiry date is required.');
+      isValid = false;
+    } else if (!isValidExpiry(expiry)) {
+      showFieldError('card-expiry', 'Invalid expiry date or card expired.');
+      isValid = false;
     }
 
-    if (!/^[0-9]{3,4}$/.test(cvv)) {
-      alert('Please enter a valid CVV.');
-      document.getElementById('card-cvv').focus();
-      return false;
+    if (!cvv) {
+      showFieldError('card-cvv', 'CVV is required.');
+      isValid = false;
+    } else if (!/^[0-9]{3,4}$/.test(cvv)) {
+      showFieldError('card-cvv', 'CVV must be 3-4 digits.');
+      isValid = false;
     }
 
     if (!document.getElementById('terms-check')?.checked) {
       alert('Please accept the Terms of Service to continue.');
-      return false;
+      isValid = false;
     }
 
-    return true;
+    if (!isValid) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    return isValid;
   }
 
   // ── CHECKOUT SUBMIT ──
